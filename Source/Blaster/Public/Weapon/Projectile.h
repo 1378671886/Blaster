@@ -25,6 +25,12 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
 
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* Tracer;
+
+	UPROPERTY()
+	class UNiagaraComponent* TracerComponent;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
