@@ -7,17 +7,18 @@
 !/Config/
 !/Config/**/*
 
-# 保留 Plugins 文件夹
+# 保留 Plugins 文件夹本身
 !/Plugins/
+!/Plugins/**/
 
 # 保留每个插件的 .uplugin 文件
 !/Plugins/**/*.uplugin
 
-# 保留每个插件的 Source 文件夹
+# 保留每个插件的 Source 文件夹及其所有内容
 !/Plugins/**/Source/
 !/Plugins/**/Source/**/*
 
-# 保留每个插件的 Config 文件夹
+# 保留每个插件的 Config 文件夹及其所有内容
 !/Plugins/**/Config/
 !/Plugins/**/Config/**/*
 
@@ -25,6 +26,9 @@
 /Plugins/**/Binaries/
 /Plugins/**/Intermediate/
 /Plugins/**/DerivedDataCache/
+/Plugins/**/Binaries/**
+/Plugins/**/Intermediate/**
+/Plugins/**/DerivedDataCache/**
 
 # 保留根目录文件
 !*.uproject
