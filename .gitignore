@@ -1,25 +1,39 @@
 # 忽略所有文件和文件夹
 *
 
-# 保留文件夹
+# 保留 Source 和 Config（主项目）
 !/Source/
 !/Source/**/*
 !/Config/
 !/Config/**/*
+
+# 保留 Plugins 文件夹
 !/Plugins/
 
-# 只保留 Plugins 中的源代码，忽略编译产物
+# 保留每个插件的 .uplugin 文件
+!/Plugins/**/*.uplugin
+
+# 保留每个插件的 Source 文件夹
 !/Plugins/**/Source/
 !/Plugins/**/Source/**/*
-!/Plugins/**/*.uplugin
-!/Plugins/**/*.h
-!/Plugins/**/*.cpp
 
-# 忽略 Plugins 中的编译产物
+# 保留每个插件的 Config 文件夹
+!/Plugins/**/Config/
+!/Plugins/**/Config/**/*
+
+# 忽略 Plugins 中的编译产物和临时文件
 /Plugins/**/Binaries/
 /Plugins/**/Intermediate/
+/Plugins/**/DerivedDataCache/
 
 # 保留根目录文件
 !*.uproject
 !.gitignore
 !.gitattributes
+
+# 全局忽略 UE 生成的编译产物
+/Binaries/
+/Intermediate/
+/Saved/
+/DerivedDataCache/
+/.vs/
