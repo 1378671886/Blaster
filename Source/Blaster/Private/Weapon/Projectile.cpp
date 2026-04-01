@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Sound/SoundCue.h"
 
 
 AProjectile::AProjectile()
@@ -30,6 +31,21 @@ AProjectile::AProjectile()
 
 }
 
+void AProjectile::Destroyed()
+{
+	Super::Destroyed();
+
+	if (ImpactNiagara)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagara, GetActorLocation(), GetActorRotation());
+	}
+
+	if (ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	}
+}
+
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -39,7 +55,16 @@ void AProjectile::BeginPlay()
 		TracerComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Tracer,CollisionBox,NAME_None,GetActorLocation(),GetActorRotation(),EAttachLocation::KeepWorldPosition,true);
 	}
 
+	if (HasAuthority())
+	{
+		CollisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	}
 
+}
+
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Destroy();
 }
 
 void AProjectile::Tick(float DeltaTime)
