@@ -9,6 +9,8 @@
 #include "Particles/ParticleSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Sound/SoundCue.h"
+#include "Engine/Engine.h"
+#include "DrawDebugHelpers.h"
 
 
 AProjectile::AProjectile()
@@ -52,7 +54,7 @@ void AProjectile::BeginPlay()
 	
 	if (Tracer)
 	{
-		TracerComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Tracer,CollisionBox,NAME_None,GetActorLocation(),GetActorRotation(),EAttachLocation::KeepWorldPosition,true);
+		TracerComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Tracer,CollisionBox, NAME_None,GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
 	}
 
 	if (HasAuthority())

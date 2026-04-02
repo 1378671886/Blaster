@@ -28,9 +28,12 @@ public:
 	
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
+
 protected:
 	virtual void BeginPlay() override;
+
 	void SetAiming(bool bIsAiming);
+
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool bIsAiming);
 
@@ -47,8 +50,16 @@ protected:
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
+	void SetHUDCrosshairs(float DeltaTime);
+
+
 private:
+	UPROPERTY()
 	class ABlasterCharacter* Character;
+	UPROPERTY()
+	class ABlasterPlayerController_Player* Controller;
+	UPROPERTY()
+	class ABlasterHUD* HUD;
 
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
@@ -69,6 +80,17 @@ private:
 	float AimCrouchSpeed = 200.f;
 
 	bool bFireButtonPressed;
+
+	/*
+	* HUD and crosshairs
+	*/
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
+
+	FVector HitTarget;
+
 
 
 public:	
