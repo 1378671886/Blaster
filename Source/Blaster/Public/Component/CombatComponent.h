@@ -4,12 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HUD/BlasterHUD.h"
+
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000.f
 
 
 class AWeapon;
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UCombatComponent : public UActorComponent
@@ -90,6 +93,8 @@ private:
 	float CrosshairShootingFactor;
 
 	FVector HitTarget;
+
+	FHUDPackage HUDPackage;
 
 	/*
 	* √È◊º∫Õ ”“∞

@@ -11,7 +11,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Controller/BlasterPlayerController_Player.h"
-#include "HUD/BlasterHUD.h"
 #include "Camera/CameraComponent.h"
 
 
@@ -141,6 +140,22 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 
 		bool bHIt = GetWorld()->LineTraceSingleByChannel(TraceHitResult,Start,End,ECollisionChannel::ECC_Visibility);
 
+		if (bHIt)
+		{
+			if (TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
+			{
+				HUDPackage.CrosshairsColor = FLinearColor::Red;
+			}
+			else
+			{
+				HUDPackage.CrosshairsColor = FLinearColor::White;
+			}
+		}
+		else
+		{
+			TraceHitResult.ImpactPoint = FVector_NetQuantize(End);
+		}
+
 	}
 
 }
@@ -157,8 +172,6 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 		if (HUD)
 		{
-			FHUDPackage HUDPackage;
-
 			if (EquippedWeapon)
 			{
 				HUDPackage.CrosshairsCenter = EquippedWeapon->CrosshairsCenter;

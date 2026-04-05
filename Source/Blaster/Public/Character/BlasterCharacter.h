@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 #include "Types/TurningInPlace.h"
+#include "Interfaces/InteractWithCrosshairsInterface.h"
 
 #include "BlasterCharacter.generated.h"
 
@@ -18,7 +19,7 @@ class UDataAsset_PlayerStartUpData;
 
 
 UCLASS()
-class BLASTER_API ABlasterCharacter : public ACharacter, public IAbilitySystemInterface
+class BLASTER_API ABlasterCharacter : public ACharacter, public IAbilitySystemInterface, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
