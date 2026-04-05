@@ -126,4 +126,6 @@ public:
 
 	FVector GetHitTarget() const;
 
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
 };
