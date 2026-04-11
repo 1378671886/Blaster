@@ -40,6 +40,8 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHit();
 
+	virtual void OnRep_ReplicatedMovement() override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -66,6 +68,8 @@ protected:
 	void Input_AbilityInputReleased(FGameplayTag InInputTag);
 
 	void AimOffset(float DeltaTime);
+	void CalculateAO_Pitch();
+	void SimProxiesTurn();
 
 	virtual void Jump() override;
 
@@ -120,6 +124,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
 
+	bool bRotateRootBone;
+	float TurnThreshold = 0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+	float CalculateSpeed();
+
 public:	
 	FORCEINLINE UBlasterAbilitySystemComponent* GetBlasterAbilitySystemComponent() const { return BlasterAbilitySystemComponent; }
 
@@ -140,5 +152,7 @@ public:
 	FVector GetHitTarget() const;
 
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+	FORCEINLINE bool ShouldRotateRootBone() const { return bRotateRootBone; }
 
 };
