@@ -141,6 +141,8 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	class ABlasterPlayerController_Player* BlasterPlayerController;
+
 public:	
 	FORCEINLINE UBlasterAbilitySystemComponent* GetBlasterAbilitySystemComponent() const { return BlasterAbilitySystemComponent; }
 

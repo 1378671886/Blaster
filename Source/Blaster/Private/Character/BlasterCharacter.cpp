@@ -20,6 +20,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "AnimInstance/BlasterAnimInstance.h"
 #include "Blaster/Blaster.h"
+#include "Controller/BlasterPlayerController_Player.h"
 
 
 
@@ -73,6 +74,13 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController_Player>(Controller) : BlasterPlayerController;
+
+	if (BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDHealth(Health,MaxHealth);
+	}
+
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
