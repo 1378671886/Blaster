@@ -74,13 +74,23 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UpdateHUDHealth();
+
+	if (HasAuthority())
+	{
+		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
+	}
+
+}
+
+void ABlasterCharacter::UpdateHUDHealth()
+{
 	BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController_Player>(Controller) : BlasterPlayerController;
 
 	if (BlasterPlayerController)
 	{
-		BlasterPlayerController->SetHUDHealth(Health,MaxHealth);
+		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
 	}
-
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -362,11 +372,6 @@ void ABlasterCharacter::TurnInPlace(float DeltaTime)
 
 }
 
-void ABlasterCharacter::MulticastHit_Implementation()
-{
-	PlayHitReactMontage();
-}
-
 void ABlasterCharacter::HideCameraIfCharacterClose()
 {
 	if (!IsLocallyControlled()) return;
@@ -405,7 +410,8 @@ float ABlasterCharacter::CalculateSpeed()
 
 void ABlasterCharacter::OnRep_Health()
 {
-
+	UpdateHUDHealth();
+	PlayHitReactMontage();
 }
 
 void ABlasterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
@@ -546,6 +552,44 @@ void ABlasterCharacter::PlayHitReactMontage()
 		FName SectionName("FromFront");
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
+}
+
+void ABlasterCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
+{
+	/*BlasterGameMode = BlasterGameMode == nullptr ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
+	if (bElimmed || BlasterGameMode == nullptr) return;
+	Damage = BlasterGameMode->CalculateDamage(InstigatorController, Controller, Damage);*/
+
+	float DamageToHealth = Damage;
+	/*if (Shield > 0.f)
+	{
+		if (Shield >= Damage)
+		{
+			Shield = FMath::Clamp(Shield - Damage, 0.f, MaxShield);
+			DamageToHealth = 0.f;
+		}
+		else
+		{
+			DamageToHealth = FMath::Clamp(DamageToHealth - Shield, 0.f, Damage);
+			Shield = 0.f;
+		}
+	}*/
+
+	Health = FMath::Clamp(Health - DamageToHealth, 0.f, MaxHealth);
+
+	UpdateHUDHealth();
+	//UpdateHUDShield();
+	PlayHitReactMontage();
+
+	/*if (Health == 0.f)
+	{
+		if (BlasterGameMode)
+		{
+			BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+			ABlasterPlayerController* AttackerController = Cast<ABlasterPlayerController>(InstigatorController);
+			BlasterGameMode->PlayerEliminated(this, BlasterPlayerController, AttackerController);
+		}
+	}*/
 }
 
 void ABlasterCharacter::PossessedBy(AController* NewController)
