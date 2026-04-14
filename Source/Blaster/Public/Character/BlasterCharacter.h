@@ -37,6 +37,7 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 	virtual void OnRep_ReplicatedMovement() override;
+	void Elim();
 
 protected:
 	virtual void BeginPlay() override;
@@ -137,11 +138,16 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_Health, VisibleAnywhere, Category = "Player Stats")
 	float Health = 100.f;
-
+	
 	UFUNCTION()
 	void OnRep_Health();
 
 	class ABlasterPlayerController_Player* BlasterPlayerController;
+
+	bool bElimmed = false;
+
+	UPROPERTY()
+	class ABlasterGameMode* BlasterGameMode;
 
 public:	
 	FORCEINLINE UBlasterAbilitySystemComponent* GetBlasterAbilitySystemComponent() const { return BlasterAbilitySystemComponent; }

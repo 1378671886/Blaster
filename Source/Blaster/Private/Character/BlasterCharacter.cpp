@@ -21,6 +21,7 @@
 #include "AnimInstance/BlasterAnimInstance.h"
 #include "Blaster/Blaster.h"
 #include "Controller/BlasterPlayerController_Player.h"
+#include "Gamemode/BlasterGameMode.h"
 
 
 
@@ -68,6 +69,11 @@ void ABlasterCharacter::OnRep_ReplicatedMovement()
 	Super::OnRep_ReplicatedMovement();
 	SimProxiesTurn();
 	TimeSinceLastMovementReplication = 0.f;
+}
+
+void ABlasterCharacter::Elim()
+{
+
 }
 
 void ABlasterCharacter::BeginPlay()
@@ -556,9 +562,9 @@ void ABlasterCharacter::PlayHitReactMontage()
 
 void ABlasterCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
 {
-	/*BlasterGameMode = BlasterGameMode == nullptr ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
+	BlasterGameMode = BlasterGameMode == nullptr ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
 	if (bElimmed || BlasterGameMode == nullptr) return;
-	Damage = BlasterGameMode->CalculateDamage(InstigatorController, Controller, Damage);*/
+	//Damage = BlasterGameMode->CalculateDamage(InstigatorController, Controller, Damage);
 
 	float DamageToHealth = Damage;
 	/*if (Shield > 0.f)
@@ -581,15 +587,15 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const U
 	//UpdateHUDShield();
 	PlayHitReactMontage();
 
-	/*if (Health == 0.f)
+	if (Health == 0.f)
 	{
 		if (BlasterGameMode)
 		{
-			BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
-			ABlasterPlayerController* AttackerController = Cast<ABlasterPlayerController>(InstigatorController);
+			BlasterPlayerController = BlasterPlayerController == nullptr ? Cast<ABlasterPlayerController_Player>(Controller) : BlasterPlayerController;
+			ABlasterPlayerController_Player* AttackerController = Cast<ABlasterPlayerController_Player>(InstigatorController);
 			BlasterGameMode->PlayerEliminated(this, BlasterPlayerController, AttackerController);
 		}
-	}*/
+	}
 }
 
 void ABlasterCharacter::PossessedBy(AController* NewController)
