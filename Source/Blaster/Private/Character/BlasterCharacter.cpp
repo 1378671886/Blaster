@@ -23,6 +23,7 @@
 #include "Controller/BlasterPlayerController_Player.h"
 #include "Gamemode/BlasterGameMode.h"
 #include "TimerManager.h"
+#include "PlayerState/BlasterPlayerState.h"
 
 
 
@@ -132,6 +133,18 @@ void ABlasterCharacter::UpdateHUDHealth()
 	}
 }
 
+void ABlasterCharacter::PollInit()
+{
+	if(BlasterPlayerState == nullptr)
+	{
+		BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
+		if (BlasterPlayerState)
+		{
+			BlasterPlayerState->AddToScore(0.f);
+		}
+	}
+}
+
 void ABlasterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -150,6 +163,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 		CalculateAO_Pitch();
 	}
 	HideCameraIfCharacterClose();
+	PollInit();
 
 }
 

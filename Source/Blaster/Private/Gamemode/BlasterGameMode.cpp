@@ -6,33 +6,34 @@
 #include "Controller/BlasterPlayerController_Player.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
+#include "PlayerState/BlasterPlayerState.h"
 
 void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABlasterPlayerController_Player* VictimController, ABlasterPlayerController_Player* AttackerController)
 {
-	/*ABlasterPlayerState* AttackerPlayerState = AttackerController ? Cast<ABlasterPlayerState>(AttackerController->PlayerState) : nullptr;
+	ABlasterPlayerState* AttackerPlayerState = AttackerController ? Cast<ABlasterPlayerState>(AttackerController->PlayerState) : nullptr;
 	ABlasterPlayerState* VictimPlayerState = VictimController ? Cast<ABlasterPlayerState>(VictimController->PlayerState) : nullptr;
 
-	ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
+	//ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
 
-	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState && BlasterGameState)
+	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState /*&& BlasterGameState*/)
 	{
 		TArray<ABlasterPlayerState*> PlayersCurrentlyInTheLead;
-		for (auto LeadPlayer : BlasterGameState->TopScoringPlayers)
+		/*for (auto LeadPlayer : BlasterGameState->TopScoringPlayers)
 		{
 			PlayersCurrentlyInTheLead.Add(LeadPlayer);
-		}
+		}*/
 		AttackerPlayerState->AddToScore(1.f);
-		BlasterGameState->UpdateTopScore(AttackerPlayerState);
-		if (BlasterGameState->TopScoringPlayers.Contains(AttackerPlayerState))
+		//BlasterGameState->UpdateTopScore(AttackerPlayerState);
+		/*if (BlasterGameState->TopScoringPlayers.Contains(AttackerPlayerState))
 		{
 			ABlasterCharacter* Leader = Cast<ABlasterCharacter>(AttackerPlayerState->GetPawn());
 			if (Leader)
 			{
 				Leader->MulticastGainedTheLead();
 			}
-		}
+		}*/
 
-		for (INT32 i = 0; i < PlayersCurrentlyInTheLead.Num(); i++)
+		/*for (INT32 i = 0; i < PlayersCurrentlyInTheLead.Num(); i++)
 		{
 			if (!BlasterGameState->TopScoringPlayers.Contains(PlayersCurrentlyInTheLead[i]))
 			{
@@ -42,9 +43,9 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABl
 					Loser->MulticastLostTheLead();
 				}
 			}
-		}
+		}*/
 	}
-	if (VictimPlayerState)
+	/*if (VictimPlayerState)
 	{
 		VictimPlayerState->AddToDefeats(1);
 	}*/

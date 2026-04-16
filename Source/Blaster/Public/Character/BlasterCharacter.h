@@ -82,7 +82,7 @@ protected:
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DamageType, class AController* InstigatorController, AActor* DamageCauser);
 	void UpdateHUDHealth();
-
+	void PollInit();
 
 private:
 	UPROPERTY(VisibleAnyWhere, Category = Camera)
@@ -164,6 +164,8 @@ private:
 
 	UPROPERTY()
 	class ABlasterGameMode* BlasterGameMode;
+
+	class ABlasterPlayerState* BlasterPlayerState;
 
 public:	
 	FORCEINLINE UBlasterAbilitySystemComponent* GetBlasterAbilitySystemComponent() const { return BlasterAbilitySystemComponent; }
