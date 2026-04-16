@@ -6,6 +6,7 @@
 #include "HUD/CharacterOverlay.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Character/BlasterCharacter.h"
 
 
 void ABlasterPlayerController_Player::SetHUDHealth(float Health, float MaxHealth)
@@ -30,6 +31,17 @@ void ABlasterPlayerController_Player::SetHUDHealth(float Health, float MaxHealth
 		HUDHealth = Health;
 		HUDMaxHealth = MaxHealth;
 	}*/
+}
+
+void ABlasterPlayerController_Player::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(InPawn);
+	if (BlasterCharacter)
+	{
+		SetHUDHealth(BlasterCharacter->GetHealth(), BlasterCharacter->GetMaxHealth());
+	}
 }
 
 void ABlasterPlayerController_Player::BeginPlay()
