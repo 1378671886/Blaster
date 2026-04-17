@@ -39,8 +39,8 @@ public:
 	//UPROPERTY(meta = (BindWidget))
 	//UTextBlock* ScoreSpacerText;
 
-	//UPROPERTY(meta = (BindWidget))
-	//UTextBlock* DefeatsAmount;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* DefeatsAmount;
 
 	//UPROPERTY(meta = (BindWidget))
 	//UTextBlock* WeaponAmmoAmount;

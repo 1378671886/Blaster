@@ -151,6 +151,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	UPROPERTY()
 	class ABlasterPlayerController_Player* BlasterPlayerController;
 
 	bool bElimmed = false;

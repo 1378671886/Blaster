@@ -28,8 +28,6 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	
-
 	void EquipWeapon(AWeapon* WeaponToEquip);
 
 protected:

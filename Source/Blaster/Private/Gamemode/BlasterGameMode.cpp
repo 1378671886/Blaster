@@ -45,10 +45,11 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABl
 			}
 		}*/
 	}
-	/*if (VictimPlayerState)
+
+	if (VictimPlayerState)
 	{
 		VictimPlayerState->AddToDefeats(1);
-	}*/
+	}
 
 	if (ElimmedCharacter)
 	{
