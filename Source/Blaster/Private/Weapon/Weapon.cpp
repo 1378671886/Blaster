@@ -224,3 +224,7 @@ void AWeapon::Dropped()
 	BlasterOwnerController = nullptr;
 }
 
+bool AWeapon::IsEmpty()
+{
+	return Ammo <= 0;
+}
