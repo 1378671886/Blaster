@@ -60,6 +60,14 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 }
 
+void UCombatComponent::Reload()
+{
+	if (CarriedAmmo > 0)
+	{
+		ServerReload();
+	}
+}
+
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -267,6 +275,13 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 }
 
+void UCombatComponent::ServerReload_Implementation()
+{
+	if(Character == nullptr) return;
+	Character->PlayReloadMontage();
+
+}
+
 void UCombatComponent::InterpFOV(float DeltaTime)
 {
 	if (EquippedWeapon == nullptr) return;
@@ -337,7 +352,6 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 {
 	MulticastFire(TraceHitTarget);
 }
-
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

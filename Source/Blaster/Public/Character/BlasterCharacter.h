@@ -36,6 +36,7 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	void PlayFireMontage(bool bAiming);
+	void PlayReloadMontage();
 	void PlayElimMontage();
 
 	virtual void OnRep_ReplicatedMovement() override;
@@ -64,6 +65,7 @@ protected:
 	void Input_Jump();
 	void Input_EquipButtonPressed();
 	void Input_CrouchButtonPressed();
+	void ReloadButtonPressed();
 	void Input_AimButtonPressed();
 	void Input_AimButtonReleased();
 
@@ -124,10 +126,15 @@ private:
 	class UAnimMontage* FireWeaponMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
+	class UAnimMontage* ReloadMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	class UAnimMontage* ElimMontage;
+
+	
 
 	void HideCameraIfCharacterClose();
 

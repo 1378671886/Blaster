@@ -24,6 +24,7 @@
 #include "Gamemode/BlasterGameMode.h"
 #include "TimerManager.h"
 #include "PlayerState/BlasterPlayerState.h"
+#include "Weapon/WeaponTypes.h"
 
 
 
@@ -258,6 +259,14 @@ void ABlasterCharacter::Input_CrouchButtonPressed()
 	}
 
 
+}
+
+void ABlasterCharacter::ReloadButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->Reload();
+	}
 }
 
 void ABlasterCharacter::Input_AimButtonPressed()
@@ -551,6 +560,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Aim, ETriggerEvent::Completed, this, &ThisClass::Input_AimButtonReleased);
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Fire, ETriggerEvent::Started, this, &ThisClass::Input_FireButtonPressed);
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Fire, ETriggerEvent::Completed, this, &ThisClass::Input_FireButtonReleased);
+	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Reload, ETriggerEvent::Started, this, &ThisClass::ReloadButtonPressed);
 
 	BlasterEnhancedInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputReleased);
 }
@@ -606,6 +616,26 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 
+}
+
+void ABlasterCharacter::PlayReloadMontage()
+{
+	if (Combat == nullptr || Combat->EquippedWeapon == nullptr)return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && ReloadMontage)
+	{
+		AnimInstance->Montage_Play(ReloadMontage);
+		FName SectionName;
+		switch (Combat->EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_AssaultRifle:
+			SectionName = FName("Rifle");
+			break;
+
+		}
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
 }
 
 void ABlasterCharacter::PlayElimMontage()
