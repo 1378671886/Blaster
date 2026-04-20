@@ -62,9 +62,18 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 void UCombatComponent::Reload()
 {
-	if (CarriedAmmo > 0)
+	if (CarriedAmmo > 0 && CombatState != ECombatState::ECS_Reloading)
 	{
 		ServerReload();
+	}
+}
+
+void UCombatComponent::FinishReloading()
+{
+	if(Character == nullptr) return;
+	if(Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccuiped;
 	}
 }
 
@@ -275,11 +284,16 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 }
 
+void UCombatComponent::HandleReload()
+{
+	Character->PlayReloadMontage();
+}
+
 void UCombatComponent::ServerReload_Implementation()
 {
 	if(Character == nullptr) return;
-	Character->PlayReloadMontage();
-
+	CombatState = ECombatState::ECS_Reloading;
+	HandleReload();
 }
 
 void UCombatComponent::InterpFOV(float DeltaTime)
@@ -337,6 +351,36 @@ void UCombatComponent::InitializeCarriedAmmo()
 	CarriedAmmoMap.Emplace(EWeaponType::EWT_AssaultRifle, StartingARAmmo);
 }
 
+void UCombatComponent::OnRep_CombatState()
+{
+	switch (CombatState)
+	{
+	case ECombatState::ECS_Reloading:
+		/*if (Character && !Character->IsLocallyControlled())*/ HandleReload();
+		break;
+	case ECombatState::ECS_Unoccuiped:
+		if (bFireButtonPressed)
+		{
+			Fire();
+		}
+		break;
+	/*case ECombatState::ECS_ThrowingGrenade:
+		if (Character && !Character->IsLocallyControlled())
+		{
+			Character->PlayThrowGrenadeMontage();
+			AttachActorToLeftHand(EquippedWeapon);
+			ShowAttachedGrenade(true);
+		}
+		break;*/
+	/*case ECombatState::ECS_SwappingWeapon:
+		if (Character && !Character->IsLocallyControlled())
+		{
+			Character->PlaySwapMontage();
+		}
+		break;*/
+	}
+}
+
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (EquippedWeapon == nullptr)return;
@@ -377,6 +421,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo,COND_OwnerOnly);
+	DOREPLIFETIME(UCombatComponent, CombatState);
 
 }
 

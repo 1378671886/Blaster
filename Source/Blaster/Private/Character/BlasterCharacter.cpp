@@ -537,6 +537,12 @@ FVector ABlasterCharacter::GetHitTarget() const
 
 }
 
+ECombatState ABlasterCharacter::GetCombatState() const
+{
+	if (Combat == nullptr) return ECombatState::ECS_MAX;
+	return Combat->CombatState;
+}
+
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  /*基于lyra的动作绑定系统*/
 {
 	checkf(InputConfigDataAsset, TEXT("Forgot to assign a valid data asset as input config"));

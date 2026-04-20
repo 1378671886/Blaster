@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "Types/TurningInPlace.h"
 #include "Interfaces/InteractWithCrosshairsInterface.h"
+#include "Types/CombatState.h"
 
 #include "BlasterCharacter.generated.h"
 
@@ -199,5 +200,6 @@ public:
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	ECombatState GetCombatState() const;
 
 };
