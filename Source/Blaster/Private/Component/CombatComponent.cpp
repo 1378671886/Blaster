@@ -60,6 +60,11 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		UGameplayStatics::PlaySoundAtLocation(this,EquippedWeapon->EquipSound,Character->GetActorLocation());
 	}
 
+	if (EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
+
 	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 	Character->bUseControllerRotationYaw = true;
 
@@ -355,10 +360,17 @@ void UCombatComponent::FireTimerFinished()
 {
 	if (EquippedWeapon == nullptr)return;
 	bCanFire = true;
+
 	if (bFireButtonPressed && EquippedWeapon->bAutomatic)
 	{
 		Fire();
 	}
+
+	if (EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
+
 }
 
 bool UCombatComponent::CanFire()
