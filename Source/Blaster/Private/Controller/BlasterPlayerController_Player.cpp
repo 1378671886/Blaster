@@ -9,6 +9,7 @@
 #include "Character/BlasterCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Gamemode/BlasterGameMode.h"
+#include "HUD/Announcement.h"
 
 
 void ABlasterPlayerController_Player::SetHUDHealth(float Health, float MaxHealth)
@@ -196,12 +197,7 @@ void ABlasterPlayerController_Player::OnMatchStateSet(FName State)
 
 	if (MatchState == MatchState::InProgress)
 	{
-		//HandleMatchHasStarted(bTeamMatch);
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if(BlasterHUD)
-		{
-			BlasterHUD->AddCharacterOverlay();
-		}
+		HandleMatchHasStarted();
 	}
 	/*else if (MatchState == MatchState::Cooldown)
 	{
@@ -213,12 +209,7 @@ void ABlasterPlayerController_Player::OnRep_MatchState()
 {
 	if (MatchState == MatchState::InProgress)
 	{
-		//HandleMatchHasStarted(bTeamMatch);
-		BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if (BlasterHUD)
-		{
-			BlasterHUD->AddCharacterOverlay();
-		}
+		HandleMatchHasStarted();
 	}
 	/*else if (MatchState == MatchState::Cooldown)
 	{
@@ -226,11 +217,29 @@ void ABlasterPlayerController_Player::OnRep_MatchState()
 	}*/
 }
 
+void ABlasterPlayerController_Player::HandleMatchHasStarted()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD)
+	{
+		BlasterHUD->AddCharacterOverlay();
+		if (BlasterHUD->Announcement)
+		{
+			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
 void ABlasterPlayerController_Player::BeginPlay()
 {
 	Super::BeginPlay();
 
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD)
+	{
+		BlasterHUD->AddAnnouncement();
+	}
+
 }
 
 void ABlasterPlayerController_Player::SetHUDTime()

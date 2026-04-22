@@ -28,6 +28,7 @@ public:
 	virtual float GetServerTime(); //与服务器时钟同步
 	virtual void ReceivedPlayer() override; //尽快同步服务器时钟
 	void OnMatchStateSet(FName State);
+	void HandleMatchHasStarted();
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
