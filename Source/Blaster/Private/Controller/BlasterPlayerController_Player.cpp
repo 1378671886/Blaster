@@ -105,6 +105,27 @@ void ABlasterPlayerController_Player::SetHUDCarriedAmmo(int32 Ammo)
 	}*/
 }
 
+void ABlasterPlayerController_Player::SetHUDMatchCountdown(float CountdownTime)
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	bool bHUDValid = BlasterHUD &&
+		BlasterHUD->CharacterOverlay &&
+		BlasterHUD->CharacterOverlay->MatchCountdownText;
+	if (bHUDValid)
+	{
+		if (CountdownTime < 0.f)
+		{
+			BlasterHUD->CharacterOverlay->MatchCountdownText->SetText(FText());
+			return;
+		}
+
+		int32 Minutes = FMath::FloorToInt(CountdownTime / 60.f);
+		int32 Seconds = CountdownTime - Minutes * 60;
+		FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+		BlasterHUD->CharacterOverlay->MatchCountdownText->SetText(FText::FromString(CountdownText));
+	}
+}
+
 void ABlasterPlayerController_Player::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -116,9 +137,54 @@ void ABlasterPlayerController_Player::OnPossess(APawn* InPawn)
 	}
 }
 
+void ABlasterPlayerController_Player::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	SetHUDTime();
+}
+
 void ABlasterPlayerController_Player::BeginPlay()
 {
 	Super::BeginPlay();
 
 	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+}
+
+void ABlasterPlayerController_Player::SetHUDTime()
+{
+	float TimeLeft = 0.f;
+	//if (MatchState == MatchState::WaitingToStart) TimeLeft = WarmupTime - GetServerTime() + LevelStartingTime;
+	//else if (MatchState == MatchState::InProgress) TimeLeft = WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	//else if (MatchState == MatchState::Cooldown) TimeLeft = CooldownTime + WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	TimeLeft = MatchTime - GetWorld()->GetTimeSeconds();
+	uint32 SecondsLeft = FMath::CeilToInt(TimeLeft);
+
+	/*if (HasAuthority())
+	{
+		if (BlasterGameMode == nullptr)
+		{
+			BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+			LevelStartingTime = BlasterGameMode->LevelStartingTime;
+		}
+		BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
+		if (BlasterGameMode)
+		{
+			SecondsLeft = FMath::CeilToInt(BlasterGameMode->GetCountdownTime() + LevelStartingTime);
+		}
+	}*/
+
+	if (CountdownInt != SecondsLeft)
+	{
+		SetHUDMatchCountdown(TimeLeft);
+		/*if (MatchState == MatchState::WaitingToStart || MatchState == MatchState::Cooldown)
+		{
+			SetHUDAnnouncementCountdown(TimeLeft);
+		}*/
+		/*if (MatchState == MatchState::InProgress)
+		{
+			SetHUDMatchCountdown(TimeLeft);
+		}*/
+	}
+
+	CountdownInt = SecondsLeft;
 }
