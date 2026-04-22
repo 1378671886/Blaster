@@ -23,12 +23,15 @@ public:
 	void SetHUDMatchCountdown(float CountdownTime);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual float GetServerTime(); //与服务器时钟同步
 	virtual void ReceivedPlayer() override; //尽快同步服务器时钟
+	void OnMatchStateSet(FName State);
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();
+	void PollInit();
 
 	/*
 	* 客户端和服务器的时间同步
@@ -59,5 +62,33 @@ private:
 	float MatchTime = 120.f;
 
 	uint32 CountdownInt = 0;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
+	FName MatchState;
+	
+	UFUNCTION()
+	void OnRep_MatchState();
+
+	UPROPERTY()
+	class UCharacterOverlay* CharacterOverlay;
+
+	bool bInitializeCharacterOverlay = false;
+
+	float HUDHealth;
+	bool bInitializeHealth = false;
+	float HUDMaxHealth;
+	float HUDScore;
+	bool bInitializeScore = false;
+	int32 HUDDefeats;
+	bool bInitializeDefeats = false;
+	int32 HUDGrenades;
+	bool bInitializeGrenades = false;
+	float HUDShield;
+	bool bInitializeShield = false;
+	float HUDMaxShield;
+	float HUDCarriedAmmo;
+	bool bInitializeCarriedAmmo = false;
+	float HUDWeaponAmmo;
+	bool bInitializeWeaponAmmo = false;
 
 };
