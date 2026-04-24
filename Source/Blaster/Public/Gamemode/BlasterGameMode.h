@@ -23,7 +23,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float WarmupTime = 10.f;
 
+	UPROPERTY(EditDefaultsOnly)
+	float MatchTime = 120.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CooldownTime = 10.f;
+
 	float LevelStartingTime = 0.f;
+
+	bool bTeamsMatch = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,6 +40,9 @@ protected:
 private:
 	float CountdownTime = 0.f;
 
+public:
+	FORCEINLINE float GetCountdownTime() const { return CountdownTime; }
+	FORCEINLINE bool IsTeamsMatch() const { return bTeamsMatch; }
 
 
 };
