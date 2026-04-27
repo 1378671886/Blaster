@@ -30,6 +30,7 @@ public:
 	virtual void ReceivedPlayer() override; //尽快同步服务器时钟
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
+	void HandleCooldown();
 protected:
 	virtual void BeginPlay() override;
 	void SetHUDTime();

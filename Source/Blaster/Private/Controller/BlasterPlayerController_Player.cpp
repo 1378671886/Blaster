@@ -221,10 +221,10 @@ void ABlasterPlayerController_Player::OnMatchStateSet(FName State)
 	{
 		HandleMatchHasStarted();
 	}
-	/*else if (MatchState == MatchState::Cooldown)
+	else if (MatchState == MatchState::Cooldown)
 	{
 		HandleCooldown();
-	}*/
+	}
 }
 
 void ABlasterPlayerController_Player::OnRep_MatchState()
@@ -233,10 +233,10 @@ void ABlasterPlayerController_Player::OnRep_MatchState()
 	{
 		HandleMatchHasStarted();
 	}
-	/*else if (MatchState == MatchState::Cooldown)
+	else if (MatchState == MatchState::Cooldown)
 	{
 		HandleCooldown();
-	}*/
+	}
 }
 
 void ABlasterPlayerController_Player::HandleMatchHasStarted()
@@ -250,6 +250,39 @@ void ABlasterPlayerController_Player::HandleMatchHasStarted()
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void ABlasterPlayerController_Player::HandleCooldown()
+{
+	BlasterHUD = BlasterHUD == nullptr ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD)
+	{
+		BlasterHUD->CharacterOverlay->RemoveFromParent();
+		bool bHUDValid = BlasterHUD->Announcement && BlasterHUD->Announcement->AnnouncementText && BlasterHUD->Announcement->InfoText;
+
+		if (bHUDValid)
+		{
+			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
+			//FString AnnouncementText = Announcement::NewMatchStartsIn;
+			//BlasterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
+
+			//ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+			//ABlasterPlayerState* BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
+			/*if (BlasterGameState && BlasterPlayerState)
+			{
+				TArray<ABlasterPlayerState*> TopPlayers = BlasterGameState->TopScoringPlayers;
+				FString InfoTextString = bShowTeamScores ? GetTeamsInfoText(BlasterGameState) : GetInfoText(TopPlayers);
+
+				BlasterHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+			}*/
+		}
+	}
+	//ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+	/*if (BlasterCharacter && BlasterCharacter->GetCombat())
+	{
+		BlasterCharacter->bDisableGameplay = true;
+		BlasterCharacter->GetCombat()->FireButtonPressed(false);
+	}*/
 }
 
 void ABlasterPlayerController_Player::BeginPlay()

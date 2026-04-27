@@ -6,6 +6,11 @@
 #include "GameFramework/GameMode.h"
 #include "BlasterGameMode.generated.h"
 
+namespace MatchState
+{
+	extern BLASTER_API const FName Cooldown; //比赛结束，显示赢家并开始冷却倒计时
+}
+
 /**
  * 
  */
