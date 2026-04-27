@@ -67,6 +67,9 @@ private:
 	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
 	
+	UPROPERTY()
+	class ABlasterGameMode* BlasterGameMode;
+
 	float MatchTime = 0.f;
 	float WarmupTime = 0.f;
 	float CooldownTime = 0.f;
