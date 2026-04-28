@@ -11,6 +11,7 @@
 #include "Gamemode/BlasterGameMode.h"
 #include "HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
+#include "Component/CombatComponent.h"
 
 
 void ABlasterPlayerController_Player::SetHUDHealth(float Health, float MaxHealth)
@@ -264,7 +265,7 @@ void ABlasterPlayerController_Player::HandleCooldown()
 		{
 			BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			//FString AnnouncementText = Announcement::NewMatchStartsIn;
-			FString AnnouncementText("New Match Starts In");
+			FString AnnouncementText("New Match Will Start Soon");
 			BlasterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 
 			//ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
@@ -278,12 +279,12 @@ void ABlasterPlayerController_Player::HandleCooldown()
 			}*/
 		}
 	}
-	//ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
-	/*if (BlasterCharacter && BlasterCharacter->GetCombat())
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+	if (BlasterCharacter && BlasterCharacter->GetCombat())
 	{
 		BlasterCharacter->bDisableGameplay = true;
 		BlasterCharacter->GetCombat()->FireButtonPressed(false);
-	}*/
+	}
 }
 
 void ABlasterPlayerController_Player::BeginPlay()
