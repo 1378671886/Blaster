@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "PlayerState/BlasterPlayerState.h"
+#include "GameState/BlasterGameState.h"
 
 namespace MatchState
 {
@@ -53,17 +54,17 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABl
 	ABlasterPlayerState* AttackerPlayerState = AttackerController ? Cast<ABlasterPlayerState>(AttackerController->PlayerState) : nullptr;
 	ABlasterPlayerState* VictimPlayerState = VictimController ? Cast<ABlasterPlayerState>(VictimController->PlayerState) : nullptr;
 
-	//ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
+	ABlasterGameState* BlasterGameState = GetGameState<ABlasterGameState>();
 
-	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState /*&& BlasterGameState*/)
+	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState && BlasterGameState)
 	{
 		TArray<ABlasterPlayerState*> PlayersCurrentlyInTheLead;
-		/*for (auto LeadPlayer : BlasterGameState->TopScoringPlayers)
+		for (auto LeadPlayer : BlasterGameState->TopScoringPlayers)
 		{
 			PlayersCurrentlyInTheLead.Add(LeadPlayer);
-		}*/
+		}
 		AttackerPlayerState->AddToScore(1.f);
-		//BlasterGameState->UpdateTopScore(AttackerPlayerState);
+		BlasterGameState->UpdateTopScore(AttackerPlayerState);
 		/*if (BlasterGameState->TopScoringPlayers.Contains(AttackerPlayerState))
 		{
 			ABlasterCharacter* Leader = Cast<ABlasterCharacter>(AttackerPlayerState->GetPawn());

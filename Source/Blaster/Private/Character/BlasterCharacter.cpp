@@ -25,6 +25,7 @@
 #include "TimerManager.h"
 #include "PlayerState/BlasterPlayerState.h"
 #include "Weapon/WeaponTypes.h"
+#include "Kismet/GameplayStatics.h"
 
 
 
@@ -106,7 +107,10 @@ void ABlasterCharacter::Destroyed()
 {
 	Super::Destroyed();
 
-	if(Combat && Combat->EquippedWeapon)
+	BlasterGameMode = BlasterGameMode == nullptr ? GetWorld()->GetAuthGameMode<ABlasterGameMode>() : BlasterGameMode;
+	bool bMatchNotInProgress = BlasterGameMode && BlasterGameMode->GetMatchState() != MatchState::InProgress;
+
+	if(Combat && Combat->EquippedWeapon && bMatchNotInProgress)
 	{
 		Combat->EquippedWeapon->Destroy();
 	}
@@ -121,6 +125,14 @@ void ABlasterCharacter::MulticastElim_Implementation()
 	}
 	bElimmed = true;
 	PlayElimMontage();
+
+	bDisableGameplay = true;
+
+	if(Combat)
+	{
+		Combat->FireButtonPressed(false);
+	}
+
 }
 
 void ABlasterCharacter::BeginPlay()
