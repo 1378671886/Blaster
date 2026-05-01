@@ -169,6 +169,16 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 }
 
+void UCombatComponent::JumpToShotgunEnd()
+{
+	// 跳转到动画上弹结束
+	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
+	if (AnimInstance && Character->GetReloadMontage())
+	{
+		AnimInstance->Montage_JumpToSection(FName("ShotgunEnd"));
+	}
+}
+
 void UCombatComponent::Fire()
 {
 	if (CanFire())

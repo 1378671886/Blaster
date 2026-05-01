@@ -8,6 +8,7 @@
 #include "Animation/AnimationAsset.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Controller/BlasterPlayerController_Player.h"
+#include "Component/CombatComponent.h"
 
 
 AWeapon::AWeapon()
@@ -100,15 +101,27 @@ void AWeapon::OnRep_WeaponState()
 
 void AWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
 {
+	if (HasAuthority())return;
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	bool IsShotgunFull = BlasterOwnerCharacter
+		&& BlasterOwnerCharacter->GetCombat()
+		&& BlasterOwnerCharacter->GetEquippedWeapon()
+		&& WeaponType == EWeaponType::EWT_Shotgun
+		&& IsFull();
+	if (IsShotgunFull)
+	{
+		BlasterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
+	}
+	SetHUDAmmo();
 }
 
 void AWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
 {
-}
-
-void AWeapon::OnRep_Ammo()
-{
-	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (HasAuthority()) return;
+	Ammo = ServerAmmo;
+	--Sequence;
+	Ammo -= Sequence;
 	SetHUDAmmo();
 }
 
@@ -118,6 +131,14 @@ void AWeapon::SpendRound()
 	
 	SetHUDAmmo();
 
+	if(HasAuthority())
+	{
+		ClientUpdateAmmo(Ammo);
+	}
+	else
+	{
+		++Sequence;
+	}
 }
 
 void AWeapon::SetWeaponState(EWeaponState State)
@@ -165,8 +186,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AWeapon, WeaponState);
-	DOREPLIFETIME(AWeapon, Ammo);
+	DOREPLIFETIME(AWeapon, WeaponState);  
 
 }
 
@@ -215,10 +235,7 @@ void AWeapon::Fire(const FVector& HitTarget)
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 	}
-	if (HasAuthority())
-	{
-		SpendRound();
-	}
+	SpendRound();
 }
 
 void AWeapon::Dropped()
@@ -241,4 +258,9 @@ void AWeapon::AddAmmo(int32 AmmoToAdd)
 bool AWeapon::IsEmpty()
 {
 	return Ammo <= 0;
+}
+
+bool AWeapon::IsFull()
+{
+	return Ammo == MagCapacity;
 }

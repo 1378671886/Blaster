@@ -37,6 +37,8 @@ public:
 
 	void FireButtonPressed(bool bPressed);
 
+	void JumpToShotgunEnd();
+
 protected:
 	virtual void BeginPlay() override;
 
