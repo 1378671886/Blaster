@@ -39,6 +39,8 @@ public:
 
 	void JumpToShotgunEnd();
 
+	bool bLocallyReloading = false;
+
 protected:
 	virtual void BeginPlay() override;
 

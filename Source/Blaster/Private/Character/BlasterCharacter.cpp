@@ -584,6 +584,12 @@ ECombatState ABlasterCharacter::GetCombatState() const
 	return Combat->CombatState;
 }
 
+bool ABlasterCharacter::IsLocallyReloading()
+{
+	if (Combat == nullptr) return false;
+	return Combat->bLocallyReloading;
+}
+
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  /*基于lyra的动作绑定系统*/
 {
 	checkf(InputConfigDataAsset, TEXT("Forgot to assign a valid data asset as input config"));
