@@ -124,6 +124,11 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
 		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = bIsAiming ? AimCrouchSpeed : BaseCrouchSpeed;
 	}
+	if(Character->IsLocallyControlled())
+	{
+		bAimButtonPressed = bIsAiming;
+	}
+	
 }
 
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
@@ -343,6 +348,14 @@ int32 UCombatComponent::AmountToReload()
 		return FMath::Clamp(RoomInMag, 0, Least);
 	}
 	return 0;
+}
+
+void UCombatComponent::OnRep_Aiming()
+{
+	if (Character && Character->IsLocallyControlled())
+	{
+		bAiming = bAimButtonPressed;
+	}
 }
 
 void UCombatComponent::ServerReload_Implementation()
