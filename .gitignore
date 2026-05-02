@@ -30,14 +30,9 @@
 /Plugins/**/Intermediate/**
 /Plugins/**/DerivedDataCache/**
 
-# Content Ŀ¼����ͼ���ʲ��ļ���
+# Content Ŀ¼ - ֻ�ٿ���ͼ
 !/Content/
-!/Content/**/*
-# �ų� Content �Զ����ɵ�Ŀ¼
-/Content/Collections/**
-/Content/Developers/**
-/Content/__ExternalActors__/**
-/Content/__ExternalObjects__/**
+!/Content/��ͼ/**
 
 # ������Ŀ¼�ļ�
 !*.uproject
