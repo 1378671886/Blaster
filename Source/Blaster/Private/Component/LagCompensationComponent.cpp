@@ -3,6 +3,9 @@
 #include "Component/LagCompensationComponent.h"
 #include "Character/BlasterCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Weapon/Weapon.h"
+
 #include "DrawDebugHelpers.h"
 
 ULagCompensationComponent::ULagCompensationComponent()
@@ -227,7 +230,7 @@ void ULagCompensationComponent::SaveFramePackageServer()
 		SaveFramePackage(ThisFrame);
 		FrameHistory.AddHead(ThisFrame);
 
-		ShowFramePackage(ThisFrame, FColor::Green);
+		//ShowFramePackage(ThisFrame, FColor::Green);
 	}
 }
 
@@ -297,5 +300,22 @@ FServerSideRewindResult ULagCompensationComponent::ServerSideRewind(ABlasterChar
 
 	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 
+}
+
+void ULagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
+{
+	FServerSideRewindResult Confirm = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
+	if (Character && HitCharacter && Character->GetEquippedWeapon() && Confirm.bHitConfirmed)
+	{
+		const float Damage = Confirm.bHeadShot ? Character->GetEquippedWeapon()->GetHeadShotDamage() : Character->GetEquippedWeapon()->GetDamage();
+
+		UGameplayStatics::ApplyDamage(
+			HitCharacter,
+			Damage,
+			Character->Controller,
+			Character->GetEquippedWeapon(),
+			UDamageType::StaticClass()
+		);
+	}
 }
 

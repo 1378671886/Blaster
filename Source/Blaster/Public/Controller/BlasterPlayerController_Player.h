@@ -31,8 +31,9 @@ public:
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
 	void HandleCooldown();
-
 	void SetHUDPing(float Ping);
+
+	float SingleTripTime = 0.f;
 
 protected:
 	virtual void BeginPlay() override;
