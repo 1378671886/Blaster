@@ -39,6 +39,33 @@ void ULagCompensationComponent::SaveFramePackage(FFramePackage& Package)
 	}
 }
 
+FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage& OlderFrame, const FFramePackage& YoungerFrame, float HitTime)
+{
+	const float Distance = YoungerFrame.Time - OlderFrame.Time;
+	const float InterpFraction = FMath::Clamp((HitTime - OlderFrame.Time) / Distance, 0.f, 1.f);
+
+	FFramePackage InterpFramePackage;
+	InterpFramePackage.Time = HitTime;
+
+	for (auto& YoungerPair : YoungerFrame.HitBoxInfo)
+	{
+		const FName& BoxInfoName = YoungerPair.Key;
+
+		const FBoxInformation& OlderBox = OlderFrame.HitBoxInfo[BoxInfoName];
+		const FBoxInformation& YoungerBox = YoungerFrame.HitBoxInfo[BoxInfoName];
+
+		FBoxInformation InterpBoxInfo;
+
+		InterpBoxInfo.Location = FMath::VInterpTo(OlderBox.Location, YoungerBox.Location, 1.f, InterpFraction);
+		InterpBoxInfo.Rotation = FMath::RInterpTo(OlderBox.Rotation, YoungerBox.Rotation, 1.f, InterpFraction);
+		InterpBoxInfo.BoxExtent = YoungerBox.BoxExtent;
+
+		InterpFramePackage.HitBoxInfo.Add(BoxInfoName, InterpBoxInfo);
+	}
+
+	return InterpFramePackage;
+}
+
 void ULagCompensationComponent::SaveFramePackageServer()
 {
 	if (Character == nullptr || !Character->HasAuthority()) return;
@@ -96,13 +123,13 @@ void ULagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter
 	const TDoubleLinkedList<FFramePackage>& History = HitCharacter->GetLagCompensation()->FrameHistory;
 	const float OldestHistoryTime = History.GetTail()->GetValue().Time;
 	const float NewestHistoryTime = History.GetHead()->GetValue().Time;
-	if (OldestHistoryTime > HitTime) return;
+	if (OldestHistoryTime > HitTime) return; //如果要查询的时间比最老的记录还早 → 无法回滚 → 直接返回
 	if (OldestHistoryTime == HitTime)
 	{
 		FrameToCheck = History.GetTail()->GetValue();
 		bShouldInterpolate = false;
 	}
-	if (NewestHistoryTime <= HitTime)
+	if (NewestHistoryTime <= HitTime) //请求时间 ≥ 最新帧时间
 	{
 		FrameToCheck = History.GetHead()->GetValue();
 		bShouldInterpolate = false;
