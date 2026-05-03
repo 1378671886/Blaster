@@ -66,6 +66,146 @@ FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage
 	return InterpFramePackage;
 }
 
+FServerSideRewindResult ULagCompensationComponent::ConfirmHit(const FFramePackage& Package, ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation)
+{
+	if (HitCharacter == nullptr) return FServerSideRewindResult();
+
+	FFramePackage CurrentFrame;
+	CacheBoxPositions(HitCharacter, CurrentFrame);
+	MoveBoxes(HitCharacter, Package);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::NoCollision);
+
+	// 首先把头的命中框设置碰撞
+	UBoxComponent* HeadBox = HitCharacter->HitCollisionBoxes[FName("head")];
+	HeadBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	HeadBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
+	FHitResult ConfirmHitResult;
+	const FVector TraceEnd = TraceStart + (HitLocation - TraceStart) * 1.25f;
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->LineTraceSingleByChannel(
+			ConfirmHitResult,
+			TraceStart,
+			TraceEnd,
+			ECollisionChannel::ECC_Visibility
+		);
+		if (ConfirmHitResult.bBlockingHit) // 爆头，提早返回
+		{
+			/*if (ConfirmHitResult.Component.IsValid())
+			{
+				UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+				if (Box)
+				{
+					DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(), FQuat(Box->GetComponentRotation()), FColor::Red, false, 8.f);
+				}
+			}*/
+
+			ResetHitBoxes(HitCharacter, CurrentFrame);
+			EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+			return FServerSideRewindResult{ true, true };
+		}
+		else // 没击中头，检查其他命中框
+		{
+			for (auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+			{
+				if (HitBoxPair.Value != nullptr)
+				{
+					HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+					HitBoxPair.Value->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+				}
+			}
+			World->LineTraceSingleByChannel(
+				ConfirmHitResult,
+				TraceStart,
+				TraceEnd,
+				ECollisionChannel::ECC_Visibility
+			);
+			if (ConfirmHitResult.bBlockingHit)
+			{
+				/*if (ConfirmHitResult.Component.IsValid())
+				{
+					UBoxComponent* Box = Cast<UBoxComponent>(ConfirmHitResult.Component);
+					if (Box)
+					{
+						DrawDebugBox(GetWorld(), Box->GetComponentLocation(), Box->GetScaledBoxExtent(), FQuat(Box->GetComponentRotation()), FColor::Blue, false, 8.f);
+					}
+				}*/
+
+				ResetHitBoxes(HitCharacter, CurrentFrame);
+				EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+				return FServerSideRewindResult{ true, false };
+			}
+		}
+	}
+
+	ResetHitBoxes(HitCharacter, CurrentFrame);
+	EnableCharacterMeshCollision(HitCharacter, ECollisionEnabled::QueryAndPhysics);
+	return FServerSideRewindResult{ false, false };
+}
+
+void ULagCompensationComponent::CacheBoxPositions(ABlasterCharacter* HitCharacter, FFramePackage& OutFramePackage)
+{
+	if (HitCharacter == nullptr) return;
+	for (auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if (HitBoxPair.Value != nullptr)
+		{
+			FBoxInformation BoxInfo;
+			BoxInfo.Location = HitBoxPair.Value->GetComponentLocation();
+			BoxInfo.Rotation = HitBoxPair.Value->GetComponentRotation();
+			BoxInfo.BoxExtent = HitBoxPair.Value->GetScaledBoxExtent();
+			OutFramePackage.HitBoxInfo.Add(HitBoxPair.Key, BoxInfo);
+		}
+	}
+}
+
+void ULagCompensationComponent::MoveBoxes(ABlasterCharacter* HitCharacter, const FFramePackage& Package)
+{
+	if (HitCharacter == nullptr) return;
+	for (auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if (HitBoxPair.Value != nullptr)
+		{
+			const FBoxInformation* BoxValue = Package.HitBoxInfo.Find(HitBoxPair.Key);
+			if (BoxValue)
+			{
+				HitBoxPair.Value->SetWorldLocation(BoxValue->Location);
+				HitBoxPair.Value->SetWorldRotation(BoxValue->Rotation);
+				HitBoxPair.Value->SetBoxExtent(BoxValue->BoxExtent);
+			}
+		}
+	}
+}
+
+void ULagCompensationComponent::ResetHitBoxes(ABlasterCharacter* HitCharacter, const FFramePackage& Package)
+{
+	if (HitCharacter == nullptr) return;
+	for (auto& HitBoxPair : HitCharacter->HitCollisionBoxes)
+	{
+		if (HitBoxPair.Value != nullptr)
+		{
+			const FBoxInformation* BoxValue = Package.HitBoxInfo.Find(HitBoxPair.Key);
+			if (BoxValue)
+			{
+				HitBoxPair.Value->SetWorldLocation(BoxValue->Location);
+				HitBoxPair.Value->SetWorldRotation(BoxValue->Rotation);
+				HitBoxPair.Value->SetBoxExtent(BoxValue->BoxExtent);
+				HitBoxPair.Value->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			}
+		}
+	}
+}
+
+void ULagCompensationComponent::EnableCharacterMeshCollision(ABlasterCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled)
+{
+	if (HitCharacter && HitCharacter->GetMesh())
+	{
+		HitCharacter->GetMesh()->SetCollisionEnabled(CollisionEnabled);
+	}
+}
+
 void ULagCompensationComponent::SaveFramePackageServer()
 {
 	if (Character == nullptr || !Character->HasAuthority()) return;
@@ -115,15 +255,16 @@ void ULagCompensationComponent::ShowFramePackage(const FFramePackage& Package, F
 	}
 }
 
-void ULagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
+FServerSideRewindResult ULagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter, const FVector_NetQuantize& TraceStart, const FVector_NetQuantize& HitLocation, float HitTime)
 {
 	bool bReturn = HitCharacter == nullptr || HitCharacter->GetLagCompensation() == nullptr || HitCharacter->GetLagCompensation()->FrameHistory.GetHead() == nullptr || HitCharacter->GetLagCompensation()->FrameHistory.GetTail() == nullptr;
+	if (bReturn) return FServerSideRewindResult();
 	FFramePackage FrameToCheck;
 	bool bShouldInterpolate = true;
 	const TDoubleLinkedList<FFramePackage>& History = HitCharacter->GetLagCompensation()->FrameHistory;
 	const float OldestHistoryTime = History.GetTail()->GetValue().Time;
 	const float NewestHistoryTime = History.GetHead()->GetValue().Time;
-	if (OldestHistoryTime > HitTime) return; //如果要查询的时间比最老的记录还早 → 无法回滚 → 直接返回
+	if (OldestHistoryTime > HitTime) return FServerSideRewindResult(); //如果要查询的时间比最老的记录还早 → 无法回滚 → 直接返回
 	if (OldestHistoryTime == HitTime)
 	{
 		FrameToCheck = History.GetTail()->GetValue();
@@ -151,10 +292,10 @@ void ULagCompensationComponent::ServerSideRewind(ABlasterCharacter* HitCharacter
 
 	if (bShouldInterpolate)
 	{
-
+		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
 	}
 
-	if (bReturn) return;
+	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 
 }
 
