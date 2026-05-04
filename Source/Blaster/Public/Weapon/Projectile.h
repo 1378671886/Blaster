@@ -47,19 +47,10 @@ protected:
 	class UBoxComponent* CollisionBox;
 
 	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* ImpactNiagara;
-
-	UPROPERTY(EditAnywhere)
 	class USoundCue* ImpactSound;
 
 private:
-	UPROPERTY(EditAnywhere)
-	class UNiagaraSystem* Tracer;
 
-	UPROPERTY()
-	class UNiagaraComponent* TracerComponent;
-
-	
 
 public:	
 	virtual void Tick(float DeltaTime) override;

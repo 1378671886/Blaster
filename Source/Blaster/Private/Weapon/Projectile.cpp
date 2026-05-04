@@ -36,11 +36,6 @@ void AProjectile::Destroyed()
 {
 	Super::Destroyed();
 
-	if (ImpactNiagara)
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagara, GetActorLocation(), GetActorRotation());
-	}
-
 	if (ImpactSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
@@ -50,11 +45,6 @@ void AProjectile::Destroyed()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (Tracer)
-	{
-		TracerComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Tracer,CollisionBox, NAME_None,GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, true);
-	}
 
 	if (HasAuthority())
 	{
