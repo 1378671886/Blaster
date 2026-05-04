@@ -17,7 +17,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 		if (World)
 		{
 			bUseSeamlessTravel = true;
-			World->ServerTravel(FString("/Game/map/BlasterMap?listen"));
+			World->ServerTravel(FString("/Game/Industrial_Area/Maps/Demo?listen"));
 		}
 	}
 
