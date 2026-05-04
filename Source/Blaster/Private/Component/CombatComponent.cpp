@@ -194,8 +194,8 @@ void UCombatComponent::Fire()
 		if (EquippedWeapon)
 		{
 			bCanFire = false;
+			if (!Character->HasAuthority()) LocalFire(HitTarget);
 			ServerFire(HitTarget, EquippedWeapon->FireDelay);
-			LocalFire(HitTarget);
 			CrosshairShootingFactor = .75f;
 		}
 	}
