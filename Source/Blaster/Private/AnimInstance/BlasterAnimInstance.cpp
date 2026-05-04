@@ -40,6 +40,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	EquippedWeapon = BlasterCharacter->GetEquippedWeapon();
 	bIsCrouched = BlasterCharacter->bIsCrouched;
 	bAiming = BlasterCharacter->IsAiming();
+	bIsSprinting = BlasterCharacter->IsSprinting();
 	TurningInPlace = BlasterCharacter->GetTurningInPlace();
 	bRotateRootBone = BlasterCharacter->ShouldRotateRootBone();
 	bElimmed = BlasterCharacter->IsElimmed();
@@ -62,7 +63,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && BlasterCharacter->GetMesh())
 	{
-		//×óÊÖik
+		//ï¿½ï¿½ï¿½ï¿½ik
 		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
 		FVector OutPosition;
 		FRotator OutRotation;
@@ -70,7 +71,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 
-		//ÓÒÊÖÃé×¼
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×¼
 		if (BlasterCharacter->IsLocallyControlled())
 		{
 			bLocallyControlled = true;

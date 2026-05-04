@@ -77,6 +77,8 @@ protected:
 	void ReloadButtonPressed();
 	void Input_AimButtonPressed();
 	void Input_AimButtonReleased();
+	void Input_SprintButtonPressed();
+	void Input_SprintButtonReleased();
 
 	void Input_AbilityInputPressed(FGameplayTag InInputTag);
 	void Input_AbilityInputReleased(FGameplayTag InInputTag);
@@ -245,6 +247,7 @@ public:
 
 	bool IsWeaponEquipped();
 	bool IsAiming();
+	bool IsSprinting();
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }

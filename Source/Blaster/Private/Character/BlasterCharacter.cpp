@@ -71,7 +71,7 @@ ABlasterCharacter::ABlasterCharacter()
 	MinNetUpdateFrequency = 33.f;
 
 	/*
-	* Hit Boxes(ÓÃÓÚ·şÎñÆ÷µ¹´øÃüÖĞÅĞ¶Ï)
+	* Hit Boxes(ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½)
 	*/
 
 	head = CreateDefaultSubobject<UBoxComponent>(TEXT("head"));
@@ -168,7 +168,7 @@ void ABlasterCharacter::Elim()
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(ElimTimer, this, &ABlasterCharacter::ElimTimerFinished, ElimDelay);
 
-	// ½ûÓÃ½ÇÉ«ÒÆ¶¯
+	// ï¿½ï¿½ï¿½Ã½ï¿½É«ï¿½Æ¶ï¿½
 	//bDisableGameplay = true;
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->StopMovementImmediately();
@@ -178,7 +178,7 @@ void ABlasterCharacter::Elim()
 		Combat->FireButtonPressed(false);
 	}
 
-	// ½ûÓÃÅö×²
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -406,6 +406,24 @@ void ABlasterCharacter::Input_AimButtonReleased()
 	}
 }
 
+void ABlasterCharacter::Input_SprintButtonPressed()
+{
+	if (bDisableGameplay) return;
+	if (Combat)
+	{
+		Combat->SetSprinting(true);
+	}
+}
+
+void ABlasterCharacter::Input_SprintButtonReleased()
+{
+	if (bDisableGameplay) return;
+	if (Combat)
+	{
+		Combat->SetSprinting(false);
+	}
+}
+
 void ABlasterCharacter::Input_AbilityInputPressed(FGameplayTag InInputTag)
 {
 	if (!ensure(BlasterAbilitySystemComponent)) return;
@@ -425,7 +443,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 	float Speed =CalculateSpeed();
 	bool bIsInAir = GetCharacterMovement()->IsFalling();
 
-	if (Speed == 0.f && !bIsInAir) // ¾²Ö¹²»¶¯£¬²»ÌøÔ¾
+	if (Speed == 0.f && !bIsInAir) // ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾
 	{
 		bRotateRootBone = true;
 		FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
@@ -442,7 +460,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		TurnInPlace(DeltaTime);
 
 	}
-	if (Speed > 0.f || bIsInAir) // ÅÜ»òÕßÌø
+	if (Speed > 0.f || bIsInAir) // ï¿½Ü»ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		bRotateRootBone = false;
 		StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
@@ -463,7 +481,7 @@ void ABlasterCharacter::CalculateAO_Pitch()
 
 	if (AO_Pitch> 90.f && !IsLocallyControlled())
 	{
-		// ·şÎñÆ÷ÉÏ£¬ÆäËû¿Í»§¶ËµÄ½ÇÉ«£¬¸©ÊÓ½Ç¶È´óÓÚ90¶ÈÊ±£¬½øĞĞĞŞÕı
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ËµÄ½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½Ó½Ç¶È´ï¿½ï¿½ï¿½90ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		//AO_Pitch = AO_Pitch - 360.f;
 		FVector2D InRange(270.f, 360.f);
 		FVector2D OutRange(-90.f, 0.f);
@@ -643,6 +661,11 @@ bool ABlasterCharacter::IsAiming()
 	return (Combat && Combat->bAiming);
 }
 
+bool ABlasterCharacter::IsSprinting()
+{
+	return (Combat && Combat->bIsSprinting);
+}
+
 AWeapon* ABlasterCharacter::GetEquippedWeapon()
 {
 	if (Combat == nullptr)
@@ -672,7 +695,7 @@ bool ABlasterCharacter::IsLocallyReloading()
 	return Combat->bLocallyReloading;
 }
 
-void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  /*»ùÓÚlyraµÄ¶¯×÷°ó¶¨ÏµÍ³*/
+void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)  /*ï¿½ï¿½ï¿½ï¿½lyraï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³*/
 {
 	checkf(InputConfigDataAsset, TEXT("Forgot to assign a valid data asset as input config"));
 
@@ -696,6 +719,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Fire, ETriggerEvent::Started, this, &ThisClass::Input_FireButtonPressed);
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Fire, ETriggerEvent::Completed, this, &ThisClass::Input_FireButtonReleased);
 	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Reload, ETriggerEvent::Started, this, &ThisClass::ReloadButtonPressed);
+	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Sprint, ETriggerEvent::Started, this, &ThisClass::Input_SprintButtonPressed);
+	BlasterEnhancedInputComponent->BindNativeInputAction(InputConfigDataAsset, BlasterGameplayTags::Input_Sprint, ETriggerEvent::Completed, this, &ThisClass::Input_SprintButtonReleased);
 
 	BlasterEnhancedInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputReleased);
 }

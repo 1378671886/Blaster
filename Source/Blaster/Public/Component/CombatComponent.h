@@ -21,7 +21,7 @@ class BLASTER_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UCombatComponent();
 
 	friend class ABlasterCharacter;
@@ -48,6 +48,11 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool bIsAiming);
+
+	void SetSprinting(bool bSprinting);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSetSprinting(bool bSprinting);
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
@@ -88,14 +93,23 @@ private:
 
 	bool bAimButtonPressed = false;
 
+	UPROPERTY(ReplicatedUsing = OnRep_Sprinting)
+	bool bIsSprinting = false;
+
 	UFUNCTION()
 	void OnRep_Aiming();
+
+	UFUNCTION()
+	void OnRep_Sprinting();
 
 	UPROPERTY(EditAnywhere)
 	float BaseWalkSpeed=600.f;
 
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed=400.f;
+
+	UPROPERTY(EditAnywhere)
+	float RunSpeed = 1000.f;
 
 	UPROPERTY(EditAnywhere)
 	float BaseCrouchSpeed = 300.f;
@@ -118,7 +132,7 @@ private:
 	FHUDPackage HUDPackage;
 
 	/*
-	* Ãé×¼ºÍÊÓÒ°
+	* çž„å‡†é•œè§†é‡Ž
 	*/
 	float DefaultFOV;
 
@@ -161,8 +175,10 @@ private:
 
 	void UpdateAmmoValues();
 
-public:	
-	
+	void UpdateMaxWalkSpeed();
 
-		
+public:
+
+
+
 };

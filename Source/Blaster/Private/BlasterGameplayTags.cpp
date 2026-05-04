@@ -13,6 +13,7 @@ namespace BlasterGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Aim, "Input.Aim");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Fire, "Input.Fire");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Reload, "Input.Reload");
+	UE_DEFINE_GAMEPLAY_TAG(Input_Sprint, "Input.Sprint");
 
 	UE_DEFINE_GAMEPLAY_TAG(Input_Toggleable, "Input.Toggleable");
 

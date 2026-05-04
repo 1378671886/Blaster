@@ -120,27 +120,69 @@ void UCombatComponent::BeginPlay()
 
 void UCombatComponent::SetAiming(bool bIsAiming)
 {
+	if (bIsAiming && bIsSprinting)
+	{
+		SetSprinting(false);
+	}
 	bAiming = bIsAiming;
 	ServerSetAiming(bIsAiming);
-	if (Character)
-	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
-		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = bIsAiming ? AimCrouchSpeed : BaseCrouchSpeed;
-	}
+	UpdateMaxWalkSpeed();
 	if(Character->IsLocallyControlled())
 	{
 		bAimButtonPressed = bIsAiming;
 	}
-	
 }
 
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
 {
 	bAiming = bIsAiming;
-	if (Character)
+	UpdateMaxWalkSpeed();
+}
+
+void UCombatComponent::SetSprinting(bool bSprinting)
+{
+	if (Character == nullptr) return;
+	if (bSprinting && Character->bIsCrouched) return;
+
+	if (bSprinting && bAiming)
 	{
-		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
-		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = bIsAiming ? AimCrouchSpeed : BaseCrouchSpeed;
+		SetAiming(false);
+	}
+
+	bIsSprinting = bSprinting;
+	ServerSetSprinting(bSprinting);
+	UpdateMaxWalkSpeed();
+}
+
+void UCombatComponent::ServerSetSprinting_Implementation(bool bSprinting)
+{
+	bIsSprinting = bSprinting;
+	UpdateMaxWalkSpeed();
+}
+
+void UCombatComponent::OnRep_Sprinting()
+{
+	UpdateMaxWalkSpeed();
+}
+
+void UCombatComponent::UpdateMaxWalkSpeed()
+{
+	if (Character == nullptr) return;
+
+	if (bIsSprinting && !Character->bIsCrouched)
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = BaseCrouchSpeed;
+	}
+	else if (bAiming)
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = AimWalkSpeed;
+		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = AimCrouchSpeed;
+	}
+	else
+	{
+		Character->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		Character->GetCharacterMovement()->MaxWalkSpeedCrouched = BaseCrouchSpeed;
 	}
 }
 
@@ -179,7 +221,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 void UCombatComponent::JumpToShotgunEnd()
 {
-	// Ìø×ªµ½¶¯»­ÉÏµ¯½áÊø
+	// ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½
 	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
 	if (AnimInstance && Character->GetReloadMontage())
 	{
@@ -294,7 +336,7 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				HUDPackage.CrosshairsTop = nullptr;
 			}
 
-			// ¼ÆËã×¼ÐÄÉ¢²¼
+			// ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½É¢ï¿½ï¿½
 
 			// [0, 600] -> [0, 1]
 			FVector2D WalkSpeedRange(0.f, Character->GetCharacterMovement()->MaxWalkSpeed);
@@ -528,6 +570,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME(UCombatComponent, bIsSprinting);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo,COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
 
