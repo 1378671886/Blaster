@@ -363,7 +363,10 @@ void ABlasterPlayerController_Player::SetHUDTime()
 		if (BlasterGameMode == nullptr)
 		{
 			BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
-			LevelStartingTime = BlasterGameMode->LevelStartingTime;
+			if (BlasterGameMode)
+			{
+				LevelStartingTime = BlasterGameMode->LevelStartingTime;
+			}
 		}
 		BlasterGameMode = BlasterGameMode == nullptr ? Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterGameMode;
 		if (BlasterGameMode)
@@ -436,7 +439,7 @@ void ABlasterPlayerController_Player::CheckPing(float DeltaTime)
 		PlayerState = PlayerState == nullptr ? GetPlayerState<ABlasterPlayerState>() : PlayerState;
 		if (PlayerState)
 		{
-			if (PlayerState->GetCompressedPing() * 4 > HighPingThreshold) //ping±»Ñ¹ËõËÄ±¶ ËùÒÔ³ËËÄ
+			if (PlayerState->GetCompressedPing() * 4 > HighPingThreshold) //pingï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½Ä±ï¿½ ï¿½ï¿½ï¿½Ô³ï¿½ï¿½ï¿½
 			{
 				HighPingWarning();
 				PingAnimationRunningTime = 0.f;
